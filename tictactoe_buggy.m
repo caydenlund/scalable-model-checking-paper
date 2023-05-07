@@ -11,8 +11,9 @@
 
 
 
---  Types:
-----------
+--------------
+--  TYPES:  --
+--------------
 
 Type
     --  Whose turn it is as the range [1, 2].
@@ -23,13 +24,13 @@ Type
     index_range_t : 0..2;
 
     --  A box can be 'X', 'O', or empty.
-    box_t : enum { X, O, EMPTY };
+    box_t : Enum { X, O, EMPTY };
 
     --  The type of a row. Each row has 3 columns.
-    row_t : array[index_range_t] of box_t;
+    row_t : Array[index_range_t] Of box_t;
 
     --  The type of the board. Has three rows.
-    board_t : array[index_range_t] of row_t;
+    board_t : Array[index_range_t] Of row_t;
 
     --  An enumeration of all patterns that should be countered.
     --
@@ -144,12 +145,13 @@ Type
     --      +---+---+---+   +---+---+---+
 
 
-    pattern_t : enum { ACROSS, ARROW, CORNERS, CROSS, CURVE, MIDDLE, SPLIT, TOGETHER };
+    pattern_t : Enum { ACROSS, ARROW, CORNERS, CROSS, CURVE, MIDDLE, SPLIT, TOGETHER };
 
 
 
---  Variables:
---------------
+------------------
+--  VARIABLES:  --
+------------------
 
 Var
     --  The current state of the board as a 3x3 matrix.
@@ -160,8 +162,9 @@ Var
 
 
 
---  Functions:
---------------
+------------------
+--  FUNCTIONS:  --
+------------------
 
 --  Initializes the given board by setting every cell to `EMPTY`.
 Procedure initialize_board(Var board : board_t);
@@ -554,6 +557,11 @@ End;
 
 
 
+--------------
+--  Rules:  --
+--------------
+
+
 --  Start state:
 ----------------
 
@@ -566,11 +574,6 @@ Ruleset INDEX : index_range_t Do
         turn := 1;
     Endstartstate;
 Endruleset;
-
-
-
---  Rules:
-----------
 
 --  Here, we define all the rules as transitions from one state to the next.
 --  Player 1's rules are accompanied with ASCII charts of the tic-tac-toe board.
