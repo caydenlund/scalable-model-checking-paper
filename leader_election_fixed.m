@@ -46,7 +46,7 @@
 --
 --  If the value that an `active` process receives is not the same value that it
 --  sent out, then it waits for the value of the second-closest active process
---  on its left. This message is tagged `two`. If the value of this proces is
+--  on its left. This message is tagged `two`. If the value of this process is
 --  the largest of the three, then it keeps its value; otherwise, it becomes
 --  `passive`.
 --
@@ -86,6 +86,7 @@ Type
     proc_state_t : Enum {
             ACTIVE_READY,
             ACTIVE_AWAITING_ONE,
+            ACTIVE_SEND_TWO,
             ACTIVE_AWAITING_TWO,
             PASSIVE,
             FINISHED
@@ -151,13 +152,14 @@ Begin
     End;
     
     --  Shuffle the values array.
-    For index_i : 2..(NUM_PROCESSES / 2) Do
-        index_j := 1;
-        While index_j != 0 Do
-            swap(values[index_i], values[index_j]);
-            index_j := (index_j + index_i) % NUM_PROCESSES;
-        Endwhile;
-    End;
+    --  TODO: This.
+    --  For index_i : 2..(NUM_PROCESSES / 2) Do
+    --      index_j := 1;
+    --      While index_j != 0 Do
+    --          swap(values[index_i], values[index_j]);
+    --          index_j := (index_j + index_i) % NUM_PROCESSES;
+    --      Endwhile;
+    --  End;
 End;
 
 
@@ -197,8 +199,28 @@ Ruleset proc_index : proc_index_t Do
             (in_tag = ONE | in_tag = TWO)
         ==>
         Begin
-            value_channel[next_index] := in_val;
-            tag_channel[next_index] := in_tag;
+            out_val := in_val;
+            out_tag := in_tag;
+            in_state := FREE;
+            out_state := BUSY;
+        Endrule;
+        
+        --  If this is a passive process, and there's an incoming message, and
+        --  the incoming message is a `FINAL` message, then we have found the
+        --  max value.
+        Rule "Passive process: found max value"
+            state = PASSIVE &
+            in_state = BUSY &
+            out_state = FREE &
+            in_tag = FINAL
+        ==>
+        Begin
+            val := in_val;
+            out_val := in_val;
+            out_tag := FINAL;
+            in_state := FREE;
+            out_state := BUSY;
+            state := FINISHED;
         Endrule;
 
         --  If this is a free active process, and the output channel is free,
@@ -208,9 +230,10 @@ Ruleset proc_index : proc_index_t Do
             out_state = FREE
         ==>
         Begin
-            out_val := in_val;
-            out_tag := in_tag;
+            out_val := val;
+            out_tag := ONE;
             out_state := BUSY;
+            state := ACTIVE_AWAITING_ONE;
         Endrule;
 
         --  If this is an active process awaiting the `ONE` message, and the
@@ -218,12 +241,76 @@ Ruleset proc_index : proc_index_t Do
         Rule "Active process: awaiting `ONE`: accept value"
             state = ACTIVE_AWAITING_ONE &
             in_state = BUSY &
-            in_tag = ONE
+            in_tag = ONE &
+            in_val != val
         ==>
         Begin
             prev_val := in_val;
             in_state := FREE;
+            state := ACTIVE_SEND_TWO;
+        Endrule;
+        
+        --  If this is an active process awaiting the `ONE` message, and the
+        --  input channel is sending a `ONE` message with the same value as
+        --  this process, then this process has the maximum value.
+        Rule "Active process: awaiting `ONE`: found max value"
+            state = ACTIVE_AWAITING_ONE &
+            in_state = BUSY &
+            in_tag = ONE &
+            in_val = val
+        ==>
+        Begin
+            state := FINISHED;
+            in_state := FREE;
+            out_val := val;
+            out_tag := FINAL;
+            out_state := BUSY;
+        Endrule;
+        
+        --  If this is an active process ready to send the `TWO` message,
+        --  and the output channel is free, send the `TWO` message.
+        Rule "Active process: send `TWO`: send value"
+            state = ACTIVE_SEND_TWO &
+            out_state = FREE
+        ==>
+        Begin
             state := ACTIVE_AWAITING_TWO;
+            out_val := prev_val;
+            out_tag := TWO;
+            out_state := BUSY;
+        Endrule;
+        
+        --  If this is an active process awaiting the `TWO` message, and the
+        --  input channel is sending a `TWO` message, accept it.
+        Rule "Active process: awaiting `TWO`: accept value"
+            state = ACTIVE_AWAITING_TWO &
+            in_state = BUSY &
+            in_tag = TWO
+        ==>
+        Begin
+            If val > prev_val & val > in_val Then
+                state := ACTIVE_READY;
+            Else
+                state := PASSIVE;
+            End;
+            in_state := FREE;
+        Endrule;
+        
+        --  If this is a `FINISHED` process and there's an incoming message,
+        --  then we run our assertions and reset the state.
+        Rule "Finished process: incoming message: run assertions"
+            state = FINISHED &
+            in_state = BUSY &
+            in_tag = FINAL
+        ==>
+        Begin
+            in_state := FREE;
+            For index : proc_index_t Do
+                Assert "Clear message channel" chan_states[index] = FREE;
+                Assert "Correct maximum value" values[index] = NUM_PROCESSES - 1;
+            End;
+            reset_all(states, values, previous_values,
+                      value_channel, tag_channel, chan_states);
         Endrule;
 
     Endalias;
