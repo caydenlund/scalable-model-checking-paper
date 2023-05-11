@@ -6,15 +6,75 @@
 %  Brief:  Contains the concluding section.                                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%  TODO: This.
-\textbf{TODO: This.}
-
 \subsection{Summary of the Main Findings}\label{subsec:summary-of-the-main-findings}
 
-%  TODO: This.
-\textbf{TODO: This.}
+In this paper, we conducted a practical exploration of scalable model
+checking using the \texttt{rumur} and \texttt{romp} tools for the Murphi
+modeling language.
+We presented two case studies: a tic-tac-toe strategy and a model for the
+leader election protocol.
+Through these case studies, we evaluated the performance and effectiveness of
+\texttt{rumur} and \texttt{romp} in identifying and correcting flaws in the
+models.
+
+In the tic-tac-toe case study, we encoded the strategy as a Murphi model and
+used both \texttt{rumur} and \texttt{romp} to identify a flaw that allowed
+the opponent to win under a certain sequence of moves.
+After correcting the flaw, both tools confirmed the model's correctness.
+This demonstrated the ability of both \texttt{rumur} and \texttt{romp} to
+effectively detect and rectify flaws in smaller models.
+
+In the leader election protocol case study,
+we analyzed a model with a large state space,
+making it infeasible for \texttt{rumur} to perform exhaustive enumeration.
+\texttt{romp} successfully detected a bug in the model,
+highlighting its scalability and efficiency for models with enormous
+state spaces.
+The bug was corrected, ensuring the model's adherence to the desired
+specifications.
 
 \subsection{Final Remarks}\label{subsec:final-remarks}
 
-%  TODO: This.
-\textbf{TODO: This.}
+Our exploration of scalable model checking using \texttt{rumur} and
+\texttt{romp} has provided valuable insights into their performance,
+effectiveness, and trade-offs.
+The choice between using an exhaustive state-space enumeration and
+a parallel random walk depends on the characteristics of the model and the
+scale of the state space.
+\texttt{rumur} excels in smaller models, offering exhaustive enumeration and
+definitive results, while \texttt{romp} is more suitable for larger models,
+providing a scalable approach with efficient coverage of enormous state spaces.
+
+Model checking plays a crucial role in ensuring the reliability, correctness,
+and safety of complex systems.
+By systematically exploring the state space and analyzing system behavior
+against specified properties, model checking aids in identifying critical
+flaws and vulnerabilities.
+The practical examination of scalable model checking techniques using
+\texttt{rumur} and \texttt{romp} contributes to the advancement of
+formal verification methods and provides engineers and developers with
+powerful tools to enhance system dependability.
+
+The exploration of scalable model checking using \texttt{rumur} and
+\texttt{romp} has provided valuable insights into their effectiveness and
+trade-offs.
+Future research directions include the development of hybrid approaches that
+combine exhaustive enumeration and parallel random walks to leverage the
+strengths of both strategies, enhancing the efficiency and accuracy of model
+checking for models with varying levels of complexity.
+Additionally, research can focus on minimizing the state space through
+induction, allowing for the application of proven protocols to larger-scale
+systems.
+Furthermore, investigating the use of scalar sets in models presents an area
+for future research, as the current case studies have primarily used
+primitive C-style arrays.
+These research avenues will further advance model-checking techniques and
+expand their applicability in various domains.
+
+In conclusion, scalable model checking techniques, exemplified by
+\texttt{rumur} and \texttt{romp}, offer valuable insights and capabilities
+for system verification.
+By leveraging these tools and exploring future research directions,
+we can ensure the correctness and reliability of increasingly complex systems,
+mitigating risks and enabling the development of robust and dependable
+software and hardware solutions.
