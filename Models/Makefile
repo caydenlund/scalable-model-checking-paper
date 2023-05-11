@@ -1,6 +1,6 @@
 #!/usr/bin/env make
 
-.PHONY: clean dining_philosophers leader_election_buggy leader_election_fixed tictactoe_buggy tictactoe_fixed
+.PHONY: clean leader_election_buggy leader_election_fixed tictactoe_buggy tictactoe_fixed
 
 CC=gcc
 CFLAGS=-lpthread -march=native -O3 -fwhole-program -mcx16
