@@ -8,9 +8,40 @@
 
 \documentclass[11pt]{article}
 
+\usepackage{color}
+\usepackage{pdftexcmds}
+
 \author{Cayden Lund (cayden.lund@utah.edu)}
 \date{11 May 2023}
 \title{Scalable Model Checking: A Practical Exploration}
+
+
+\newcommand{\tictactoeletter}[1]{
+    \ifnum\pdfstrcmp{#1}{X}=0
+    X
+    \else\ifnum\pdfstrcmp{#1}{O}=0
+    O
+    \else\ifnum\pdfstrcmp{#1}{+}=0
+    \textcolor{blue}{X}
+    \else\ifnum\pdfstrcmp{#1}{*}=0
+    \textcolor{red}{O}
+    \else\ifnum\pdfstrcmp{#1}{\#}=0
+    \textcolor{green}{\#}
+    \else
+    \phantom{X}
+    \fi\fi\fi\fi\fi
+}
+
+
+\newcommand{\tictactoeboard}[9]{
+    \begin{tabular}{c|c|c}
+        \tictactoeletter{#1} & \tictactoeletter{#2} & \tictactoeletter{#3} \\
+        \hline
+        \tictactoeletter{#4} & \tictactoeletter{#5} & \tictactoeletter{#6} \\
+        \hline
+        \tictactoeletter{#7} & \tictactoeletter{#8} & \tictactoeletter{#9}
+    \end{tabular}
+}
 
 
 \begin{document}

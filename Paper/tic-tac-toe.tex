@@ -6,25 +6,235 @@
 %  Brief:  Contains the section on the tic-tac-toe case study.                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%  TODO: This.
-\textbf{TODO: This.}
+Tic-Tac-Toe is a classic two-player game played on a $3 \times 3$ grid.
+The game is also known as \textit{noughts and crosses} or \textit{X's and O's},
+with one player marking the squares with X's and the other with O's.
+The objective of the game is for a player to get three marks in a row of that
+player's type, either horizontally, vertically, or diagonally, before the
+opponent.
+If all the squares are filled without a winner, the game is considered a draw.
 
 \subsection{The Tic-Tac-Toe Strategy}\label{subsec:the-tic-tac-toe-strategy}
 
-%  TODO: This.
-\textbf{TODO: This.}
+The goal of this strategy is to never allow the opponent to win.
+This means that either the agent employing the strategy
+(from here on, \textit{the player}) wins the game, or the game ends in a draw.
+
+In this strategy, the player is assumed to go first.
+The player's mark is \textit{X}.
+The opponent's mark is \textit{O}.
+
+\begin{figure}
+    \begin{center}
+        \tictactoeboard{+}{ }{ }{ }{ }{ }{ }{ }{ }
+    \end{center}
+    \caption{The player's first move.}
+    \label{fig:ttt-move-1}
+\end{figure}
+
+The player's first move is in the top-left corner of the board,
+as shown in Figure~\ref{fig:ttt-move-1}.
+From there, the opponent may place a mark in any of the eight remaining
+locations on the board.
+Depending on the opponent's next move, the player will react accordingly.
+
+\begin{figure}
+    \begin{center}
+        \vspace{1em}
+
+        \begin{tabular}{c c c}
+            \tictactoeboard{X}{*}{ }{ }{+}{ }{ }{ }{ } &
+            \tictactoeboard{X}{ }{*}{ }{ }{ }{ }{ }{+} &
+            \tictactoeboard{X}{ }{ }{*}{+}{ }{ }{ }{ }
+        \end{tabular}
+
+        \vspace{2em}
+
+        \begin{tabular}{c c c}
+            \tictactoeboard{X}{ }{ }{ }{*}{ }{ }{ }{+} &
+            \tictactoeboard{X}{ }{ }{ }{+}{*}{ }{ }{ } &
+            \tictactoeboard{X}{ }{ }{ }{ }{ }{*}{ }{+}
+        \end{tabular}
+
+        \vspace{2em}
+
+        \begin{tabular}{c c c}
+            \tictactoeboard{X}{ }{ }{ }{+}{ }{ }{*}{ } &
+            \tictactoeboard{X}{+}{ }{ }{ }{ }{ }{ }{*} &
+            \phantom{\tictactoeboard{X}{ }{ }{ }{ }{ }{ }{ }{ }}
+        \end{tabular}
+    \end{center}
+    \caption{The player's second move.}
+    \label{fig:ttt-move-2}
+\end{figure}
+
+Figure~\ref{fig:ttt-move-2} shows the lookup table for the player's moves
+for the second turn of the game.
+For brevity, the entire strategy isn't described in the paper;
+see the accompanying file \texttt{tictactoe\_buggy.m} for details.
 
 \subsection{The Flaw in the Strategy}\label{subsec:the-flaw-in-the-strategy}
 
-%  TODO: This.
-\textbf{TODO: This.}
+\begin{figure}
+    \begin{center}
+        \begin{tabular}{c c c}
+            \tictactoeboard{+}{ }{ }{ }{ }{ }{ }{ }{ } &
+            \tictactoeboard{X}{ }{ }{ }{ }{ }{ }{ }{*} &
+            \tictactoeboard{X}{+}{ }{ }{ }{ }{ }{ }{O}
+        \end{tabular}
 
-\subsection{Identifying the Flaw in \texttt{rumur} and \texttt{romp}}\label{subsec:identifying-the-flaw-in-rumur-and-romp}
+        \vspace{2em}
 
-%  TODO: This.
-\textbf{TODO: This.}
+        \begin{tabular}{c c c}
+            \tictactoeboard{X}{X}{*}{ }{ }{ }{ }{ }{O} &
+            \tictactoeboard{X}{X}{O}{ }{ }{+}{ }{ }{O} &
+            \tictactoeboard{X}{X}{O}{ }{ }{X}{*}{ }{O}
+        \end{tabular}
+
+        \vspace{2em}
+
+        \begin{tabular}{c c c}
+            \tictactoeboard{X}{X}{O}{ }{+}{X}{O}{ }{O} &
+            \tictactoeboard{X}{X}{O}{ }{X}{X}{O}{*}{O} &
+            \phantom{\tictactoeboard{X}{ }{ }{ }{ }{ }{ }{ }{ }}
+        \end{tabular}
+    \end{center}
+    \caption{The losing sequence.}
+    \label{fig:ttt-losing-sequence}
+\end{figure}
+
+Under a certain sequence of moves, the tic-tac-toe strategy,
+which is under examination in this case study,
+inadvertently allows the opponent to secure a winning position.
+Specifically, there exists a particular sequence of moves where the strategy
+fails to anticipate a strategic counter-move from the opponent,
+resulting in an unfavorable board configuration.
+This sequence is shown in Figure~\ref{fig:ttt-losing-sequence}.
+The flaw in the strategy opens up an opportunity for the opponent to
+strategically place marks and create a winning pattern,
+exploiting the strategy's vulnerability.
+By identifying and addressing this specific sequence of moves,
+we aim to rectify the flaw and enhance the strategy's effectiveness in
+preventing the opponent from achieving a winning position.
+
+\subsection{Identifying the Flaw with \texttt{rumur} and \texttt{romp}}\label{subsec:identifying-the-flaw-with-rumur-and-romp}
+
+To conduct a thorough analysis of the tic-tac-toe strategy,
+we encoded it as a Murphi model.
+The process involved capturing the key elements and decision-making rules of
+the strategy within the formal framework of the Murphi modeling language.
+We defined the state space of the model, representing the various
+configurations of the tic-tac-toe game board
+(i.e., the positions occupied by X's and O's) and the current player's turn.
+Additionally, we encoded the strategy's logic for determining optimal moves
+based on the current game state.
+By encapsulating the tic-tac-toe strategy within the Murphi model,
+we created a formal representation that allowed us to apply model-checking
+techniques, such as using \texttt{rumur} and \texttt{romp},
+to systematically analyze and evaluate the strategy's effectiveness and
+identify any underlying flaws or vulnerabilities.
+This model can be found in the accompanying file \texttt{tictactoe\_buggy.m}.
+
+First, we analyze the model with \texttt{rumur}.
+\texttt{rumur} has a very user-friendly command-line interface:
+we first invoke the \texttt{rumur} command and supply it with three arguments:
+the filename of the model, \texttt{-o} (for ``out''), and the output filename
+for a generated C file.
+\texttt{rumur} then parses the model and generates a C file that will enumerate
+the entire state space of the model and identify any underlying faults.
+After that, we compile the C file and run the generated binary.
+
+Running the compiled program reveals that there was a sequence in which
+Player 2 wins the game.
+Further, it shows the complete trace of the losing sequence from the start
+state to the losing state, with all transitions.
+This sequence is shown in Figure~\ref{fig:ttt-losing-sequence}.
+
+Analysis of the model with \texttt{romp} is not quite as straightforward.
+First, we generate C++ code for the model by invoking the \texttt{romp}
+command with four arguments: \texttt{-S} (for ``simple traces''), the
+filename of the model, \texttt{-o} for (``out''), and the output filename
+for a generated C++ file.
+\texttt{romp} then parses the model and generates a C++ program that will
+perform a parallel random walk of the model's state space.
+That is, several threads will simultaneously run the model from the starting
+state and perform random transitions from the starting state.
+This process is repeated several times, so an enormous state space is covered
+in a short amount of time.
+We compile the C++ program and run the generated binary with the
+\texttt{-t} flag (for ``traces'').
+
+Upon being run, the generated program reports that there is a losing sequence
+in which the opponent wins the game.
+Because of the random nature of these parallel walks, any readers repeating the
+experiment here may need to run the binary a couple of times for it to come
+across a losing sequence.
+The program's invocation saves ninety-six different traces as JSON files,
+and reports which one of the traces contains the losing sequence.
+For every state in the sequence, this trace lists every rule and states whether
+it applies to the state, before selecting and applying a rule.
+Thus, this trace is very large and difficult to read by hand.
+We recommend using some kind of filtering utility like \texttt{sed} to trim
+down the trace file to a readable size, holding only relevant information.
 
 \subsection{Correcting the Flaw}\label{subsec:correcting-the-flaw}
 
-%  TODO: This.
-\textbf{TODO: This.}
+\begin{figure}
+    \begin{center}
+        \tictactoeboard{X}{X}{O}{ }{\#}{X}{*}{\#}{O}
+    \end{center}
+    \caption{The disadvantageous state. The opponent can win in two ways.}
+    \label{fig:ttt-trouble-state}
+\end{figure}
+
+By analyzing the sequence, we see that this sequence of moves allows the
+opponent to reach a state where there are two unblocked two-in-a-rows.
+That is, after the opponent takes a turn, there are two spaces on the board
+where, if the opponent were to take another turn, the opponent would win.
+This guarantees that the opponent will win, as the player can only place a mark
+in one of these two spaces.
+This state is shown in Figure~\ref{fig:ttt-trouble-state},
+with \tictactoeletter{\#} representing a blank space that the opponent can
+fill to win the game.
+The player can only fill one of these two spaces on the player's turn.
+
+\begin{figure}
+    \begin{center}
+        \vspace{1em}
+
+        \begin{tabular}{c c c}
+            \tictactoeboard{+}{ }{ }{ }{ }{ }{ }{ }{ } &
+            \tictactoeboard{X}{ }{ }{ }{ }{ }{ }{ }{*} &
+            \tictactoeboard{X}{ }{+}{ }{ }{ }{ }{ }{O}
+        \end{tabular}
+
+        \vspace{2em}
+
+        \begin{tabular}{c c c}
+            \tictactoeboard{X}{*}{X}{ }{ }{ }{ }{ }{O} &
+            \tictactoeboard{X}{O}{X}{ }{ }{ }{+}{ }{O} &
+            \tictactoeboard{X}{O}{X}{*}{ }{ }{X}{ }{O}
+        \end{tabular}
+
+        \vspace{2em}
+
+        \begin{tabular}{c c c}
+            \tictactoeboard{X}{O}{X}{O}{+}{ }{X}{ }{O} &
+            \phantom{\tictactoeboard{ }{ }{ }{ }{ }{ }{ }{ }{ }} &
+            \phantom{\tictactoeboard{ }{ }{ }{ }{ }{ }{ }{ }{ }}
+        \end{tabular}
+    \end{center}
+    \caption{A winning sequence with the new strategy.}
+    \label{fig:ttt-win}
+\end{figure}
+
+To correct the flaw in the strategy, we need to prevent this from happening.
+We change the second move of the game so that the player, instead of putting
+a mark in the top-center space, will put a mark in the top-right space.
+By making this change, the opponent is never able to reach the advantageous
+state where there are two blank spaces that the opponent can fill to win the
+game.
+A sample game played with the fixed strategy is shown in
+Figure~\ref{fig:ttt-win}.
+This corrected strategy can be found in the accompanying file
+\texttt{tictactoe\_fixed.m}.
