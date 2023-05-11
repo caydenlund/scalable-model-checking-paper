@@ -65,7 +65,7 @@
 
 Const
     --  The number of processes.
-    NUM_PROCESSES : 100;
+    NUM_PROCESSES : 400;
 
     --  Value multiplier.
     --  Values range from (this) to (this * NUM_PROCESSES).
@@ -342,6 +342,7 @@ Ruleset proc_index : proc_index_t Do
             in_state := FREE;
             For index : proc_index_t Do
                 Assert "Clear message channel" chan_states[index] = FREE;
+                Assert "Processes are `FINISHED`" states[index] = FINISHED;
                 Assert "Correct maximum value" values[index] = VALUE_MULTIPLIER * NUM_PROCESSES;
             End;
             reset_all(states, values, previous_values,
