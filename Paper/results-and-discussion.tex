@@ -6,20 +6,95 @@
 %  Brief:  Contains the section on results and discussion.                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%  TODO: This.
-\textbf{TODO: This.}
-
 \subsection{Comparing the Performance and Effectiveness of \texttt{rumur} and \texttt{romp}}\label{subsec:comparing-the-performance-and-effectiveness-of-rumur-and-romp}
 
-%  TODO: This.
-\textbf{TODO: This.}
+For the Tic-Tac-Toe strategy model, both \texttt{rumur} and \texttt{romp}
+successfully identified the flaw in the strategy that allowed the opponent to
+win under a certain sequence of moves.
+The exhaustive enumeration approach employed by \texttt{rumur} provided a
+definitive answer, confirming the presence of the flaw.
+On the other hand, \texttt{romp} utilized its parallel random walk strategy
+to efficiently explore the state space and identify the same flaw.
+Both tools proved effective in detecting and localizing the bug, enabling the
+correction of the flawed strategy.
+
+In the case of the leader election protocol model, the size of the state
+space proved too large for \texttt{rumur} to perform a comprehensive analysis.
+As a result, we could not obtain conclusive results from \texttt{rumur}
+regarding the correctness of the model or the identification of flaws.
+\texttt{romp}, however, with its ability to handle large state spaces through
+parallel random walks, successfully identified a bug in the model.
+The flaw was rectified after its detection, strengthening the correctness of
+the leader election protocol.
+After this flaw was corrected, \texttt{romp} detected no more issues.
 
 \subsection{The Trade-offs Between Exhaustive Enumeration and Parallel Random Walks}\label{subsec:the-trade-offs-between-exhaustive-enumeration-and-parallel-random-walks}
 
-%  TODO: This.
-\textbf{TODO: This.}
+The comparison between \texttt{rumur} and \texttt{romp} highlights the
+trade-offs associated with the choice between exhaustive enumeration and
+parallel random walks in the context of model checking.
+
+\texttt{rumur}, with its exhaustive enumeration approach,
+guarantees that every possible state is explored, providing a definitive
+answer regarding the presence of flaws.
+This method is particularly suitable for smaller models with manageable state
+spaces, where it is feasible to exhaustively cover all states.
+When confronted with models characterized by vast state spaces, however,
+such as the leader election protocol, the exhaustive enumeration approach
+becomes impractical due to the rapid growth in the number of states to
+be explored.
+
+On the other hand, \texttt{romp}, leveraging parallel random walks,
+offers a scalable and efficient approach to model checking.
+By simultaneously exploring multiple states and performing random transitions,
+\texttt{romp} covers an extensive state space in a short amount of time.
+This approach is well-suited for models with large and complex state spaces,
+where exhaustive enumeration is infeasible.
+The probabilistic nature of parallel random walks introduces a level of
+uncertainty, however, as it cannot provide strong guarantees of complete
+bug-freedom in the model.
+
+The choice between \texttt{rumur} and \texttt{romp} depends on the
+characteristics of the model and the specific requirements of the analysis.
+For smaller models where exhaustive coverage is possible, \texttt{rumur} can
+provide definitive results.
+Conversely, for models with enormous state spaces where exhaustive
+enumeration is infeasible, \texttt{romp} offers a practical and scalable
+approach to detect bugs.
 
 \subsection{Areas for Future Research}\label{subsec:areas-for-future-research}
 
-%  TODO: This.
-\textbf{TODO: This.}
+The exploration of scalable model checking using \texttt{rumur} and
+\texttt{romp} has provided valuable insights into their effectiveness and
+trade-offs.
+However, there are several areas for future research that can further enhance
+model-checking techniques.
+
+One direction for future research is the development of hybrid approaches
+that combine the strengths of exhaustive enumeration and parallel random walks.
+Such approaches could intelligently switch between strategies based on the
+characteristics of the model or employ heuristics to determine the most
+suitable approach at different stages of the analysis.
+A hybrid approach could even be used to make exhaustive guarantees for
+granular functions and rules, and then parallel random walks could be used to
+analyze the other functions and rules with too large a state space to entirely
+enumerate.
+By leveraging the benefits of both exhaustive enumeration and parallel random
+walks, these hybrid techniques could improve the efficiency and accuracy of
+model checking, especially for models with varying levels of complexity.
+
+Another direction for future research is to minimize the state space through
+induction.
+The leader election protocol is a good example of how this could be effective:
+if the protocol works for, say, three processes, four processes,
+and five processes, then one can apply induction to show that the protocol will
+work for any arbitrary number of processes beyond that.
+Such an approach could detect this and exhaustively enumerate the states of
+a model with three, four, and five processes, and then apply induction to prove
+that the protocol will work for four hundred processes, or for even higher
+magnitudes.
+
+Finally, there is room for future research in regard to scalar sets;
+the case studies of the tic-tac-toe strategy and the leader election protocol
+use primitive C-style arrays to represent all parts of the state.
+We have done no experimentation on models with scalar sets.
