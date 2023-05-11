@@ -2,3 +2,5 @@
 *.cpp
 *.c
 traces
+.idea/
+out/
