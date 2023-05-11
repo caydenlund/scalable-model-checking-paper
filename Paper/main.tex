@@ -6,35 +6,54 @@
 %  Brief:  The main document skeleton.                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[11pt]{article}
+\documentclass[12pt]{article}
 
 \usepackage{color}
+\usepackage{geometry}
+\usepackage{indentfirst}
+\usepackage{multicol}
 \usepackage{pdftexcmds}
+
+\geometry{
+    left=1in,
+    right=1in,
+    top=1in,
+    bottom=1in
+}
+\linespread{1.0}
+\setlength{\parskip}{8pt}
 
 \author{Cayden Lund (cayden.lund@utah.edu)}
 \date{11 May 2023}
 \title{Scalable Model Checking: A Practical Exploration}
 
+\definecolor{playercolor}{rgb}{0.145, 0.388, 0.922}
+\definecolor{opponentcolor}{rgb}{0.863, 0.149, 0.149}
+\definecolor{potentialcolor}{rgb}{0.133, 0.773, 0.369}
+
+\newcommand{\tictactoeboldletter}[1]{
+    \textbf{#1}
+}
 
 \newcommand{\tictactoeletter}[1]{
     \ifnum\pdfstrcmp{#1}{X}=0
-    X
+    \tictactoeboldletter{X}
     \else\ifnum\pdfstrcmp{#1}{O}=0
-    O
+    \tictactoeboldletter{O}
     \else\ifnum\pdfstrcmp{#1}{+}=0
-    \textcolor{blue}{X}
+    \textcolor{playercolor}{\tictactoeboldletter{X}}
     \else\ifnum\pdfstrcmp{#1}{*}=0
-    \textcolor{red}{O}
+    \textcolor{opponentcolor}{\tictactoeboldletter{O}}
     \else\ifnum\pdfstrcmp{#1}{\#}=0
-    \textcolor{green}{\#}
+    \textcolor{potentialcolor}{\tictactoeboldletter{\#}}
     \else
-    \phantom{X}
+    \phantom{\tictactoeboldletter{X}}
     \fi\fi\fi\fi\fi
 }
 
 
 \newcommand{\tictactoeboard}[9]{
-    \begin{tabular}{c|c|c}
+    \begin{tabular}{c | c | c}
         \tictactoeletter{#1} & \tictactoeletter{#2} & \tictactoeletter{#3} \\
         \hline
         \tictactoeletter{#4} & \tictactoeletter{#5} & \tictactoeletter{#6} \\
