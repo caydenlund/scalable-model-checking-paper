@@ -6,15 +6,82 @@
 %  Brief:  Contains the introductory section.                                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%  TODO: This.
-\textbf{TODO: This.}
-
 \subsection{The Murphi Modeling Language}\label{subsec:the-murphi-modeling-language}
 
-%  TODO: This.
-\textbf{TODO: This.}
+Model checking plays a vital role in ensuring the reliability and correctness
+of complex systems, ranging from hardware designs to software applications.
+As systems grow increasingly intricate and interconnected, the potential for
+errors and vulnerabilities also escalates.
+Model checking provides a systematic and formal approach to identify design
+flaws, uncover subtle bugs, and verify the adherence of systems to desired
+specifications.
+By exploring the state space of a model and analyzing the system's behavior
+against specified properties, model checking aids in identifying critical
+issues that might lead to malfunctions, security breaches, or safety hazards.
+The significance of model checking extends beyond the initial development
+phase, as it can also be employed during system evolution and maintenance to
+detect unintended consequences of modifications and ensure the preservation
+of system correctness.
+With its ability to provide rigorous analysis and verification, model
+checking plays a pivotal role in improving system dependability and reducing
+the risk of costly errors and failures.
+
+To facilitate the model-checking process, several modeling languages have been
+developed, each designed to capture the essential characteristics of a system
+under scrutiny.
+One such language is the Murphi modeling language, which has gained popularity
+due to its intuitive syntax and powerful expressive capabilities.
+
+The Murphi modeling language provides a formal framework for describing system
+behavior by specifying its state space and the rules governing state
+transitions.
+By defining the system's properties and constraints, engineers can create
+precise and detailed models that capture the essential aspects of the system's
+functionality.
+
+Moreover, the flexibility of the Murphi modeling language has led to the
+development of various model-checking tools specifically tailored for Murphi
+models.
+These tools, such as \texttt{rumur} and \texttt{romp}, offer different
+strategies and algorithms to explore and analyze the state space of Murphi
+models.
+By leveraging these tools, engineers can efficiently verify the correctness
+and identify potential flaws in their systems.
 
 \subsection{\texttt{rumur} and \texttt{romp}}\label{subsec:rumur-and-romp}
 
-%  TODO: This.
-\textbf{TODO: This.}
+In the context of Murphi model checking, two notable tools have gained
+prominence: \texttt{rumur} and \texttt{romp}.
+These tools offer different approaches to model checking,
+catering to varying requirements and constraints of the system being analyzed.
+
+\texttt{rumur} performs an explicit enumeration of the entire state space,
+exhaustively examining all possible system states.
+This exhaustive approach provides a definitive answer regarding the presence of
+flaws in the model.
+It is particularly well-suited for smaller models where the state space can be
+completely covered.
+
+In contrast, \texttt{romp} adopts a parallel random walk strategy for model
+checking.
+By exploring the state space in a randomized and parallelized manner,
+\texttt{romp} can quickly cover an enormous state space.
+However, due to its probabilistic nature, it cannot offer strong guarantees of
+complete bug-freedom in the model.
+
+The choice between \texttt{rumur} and \texttt{romp} depends on the
+characteristics of the system being analyzed.
+For smaller models, where it is feasible to exhaustively cover the state space,
+\texttt{rumur} can provide a definitive answer on the presence of flaws.
+On the other hand, for models with enormous state spaces where exhaustive
+enumeration is infeasible, \texttt{romp} offers a practical and scalable
+approach to detect potential bugs.
+
+In this paper, we present a practical exploration of scalable model checking
+using \texttt{rumur} and \texttt{romp}.
+We demonstrate their effectiveness by examining two buggy models:
+a tic-tac-toe strategy and a model for the leader election protocol.
+Through these case studies, we evaluate the capabilities of
+\texttt{rumur} and \texttt{romp} in identifying and correcting flaws,
+shedding light on their respective strengths and limitations in different
+scenarios.
