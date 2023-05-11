@@ -1,11 +1,13 @@
 --------------------------------------------------------------------------------
---  File:   leader_election_fixed.m                                           --
+--  File:   leader_election_buggy.m                                           --
 --  Author: Cayden Lund (cayden.lund@utah.edu)                                --
 --          Student, University of Utah                                       --
 --                                                                            --
 --  Brief:  This is a Murphi model that encodes the leader election           --
 --          algorithm developed by Dolev, Klawe, and Rodeh, as outlined by    --
 --          Edmund M. Clarke.                                                 --
+--          However, this encoding contains a bug. A model-checking tool can  --
+--          catch this bug.                                                   --
 --------------------------------------------------------------------------------
 
 
@@ -267,8 +269,7 @@ Ruleset proc_index : proc_index_t Do
         Rule "Active process: awaiting `ONE`: found max value"
             state = ACTIVE_AWAITING_ONE &
             in_state = BUSY &
-            in_tag = ONE &
-            in_val = val
+            in_tag = ONE
         ==>
         Begin
             state := FINISHED;
