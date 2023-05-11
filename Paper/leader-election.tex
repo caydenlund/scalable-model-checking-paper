@@ -6,25 +6,137 @@
 %  Brief:  Contains the section on the leader election protocol case study.    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%  TODO: This.
-\textbf{TODO: This.}
-
 \subsection{The Leader Election Protocol}\label{subsec:the-leader-election-protocol}
 
-%  TODO: This.
-\textbf{TODO: This.}
+In this case study, we examine the leader election protocol implemented in
+the Murphi modeling language.
+The leader election protocol aims to identify the process with the highest
+value among a group of four hundred processes.
+These processes are arranged in a circle, where each process can only receive
+messages from its left and send messages to its right.
+Each process initially starts in the \texttt{ACTIVE} state and is assigned a
+unique value.
+The protocol operates based on a set of rules and message passing between the
+processes.
+
+The leader election protocol defines two main states for the processes:
+\texttt{ACTIVE} and \texttt{PASSIVE}.
+Initially, all processes are in the \texttt{ACTIVE} state.
+A process transitions to the \texttt{PASSIVE} state when it learns that its
+value cannot be the maximum value among all processes.
+
+In the \texttt{PASSIVE} state, a process only receives messages marked
+\texttt{ONE} or \texttt{TWO} from its left and forwards the messages to its
+right.
+If it receives a message marked \texttt{FINAL}, then it records the value,
+transitions to the \texttt{FINISHED} state, and then forwards the message
+to the process on its right.
+
+In the \texttt{ACTIVE} state, each process follows a set of rules for
+exchanging messages and determining the maximum value.
+First, each \texttt{ACTIVE} process sends its own value to the right and then
+awaits the value of the closest \texttt{ACTIVE} process on its left.
+This message, tagged as \texttt{ONE}, is saved for later use as a comparison
+to determine the maximum value.
+
+If an \texttt{ACTIVE} process receives a value that is different from the one
+it sent, it waits for the value of the second-closest \texttt{ACTIVE} process
+on its left.
+This message, tagged as \texttt{TWO}, is then compared with the process's value
+and the previously-saved value of the closest \texttt{ACTIVE} process.
+If the value of the current process is the largest of the three,
+the current process retains its value and remains \texttt{ACTIVE}.
+Otherwise, it transitions to the \texttt{PASSIVE} state.
+
+When an \texttt{ACTIVE} process receives the same value it sent,
+it concludes that it is the only \texttt{ACTIVE} process with the maximum value.
+This is a safe conclusion because each process has a unique value, and because
+a process receiving its own value means that the process is its own closest
+active process, meaning that it is the only \texttt{ACTIVE} process.
+When this happens, the process sends its value once more,
+tagged as \texttt{FINAL}, and transitions to the \texttt{FINISHED} state.
+
+If a process receives a message tagged as \texttt{FINAL}, it saves the
+received value as the maximum value, forwards the message to its right,
+and transitions to the \texttt{FINISHED} state.
+
+When a process in the \texttt{FINISHED} state receives a message tagged
+\texttt{FINAL}, then all processes should be in the \texttt{FINISHED} state.
+At this point, the assertions are made
+that all processes are in the \texttt{FINISHED} state;
+that there are no pending, unreceived messages;
+and that the saved maximum value is correct for all processes.
 
 \subsection{The Flaw in the Model}\label{subsec:the-flaw-in-the-model}
 
-%  TODO: This.
-\textbf{TODO: This.}
+We created a Murphi model of the leader election protocol.
+This model has a rule named
+``Active process: awaiting \texttt{ONE}: found max value''.
+The condition upon which this rule can be applied is incorrect;
+the model does not check whether the received value tagged \texttt{ONE} is
+equivalent to the current process's value.
+That is, any \texttt{ACTIVE} process receiving a value tagged \texttt{ONE}
+can apply this rule, mark itself as \texttt{FINISHED}, and send a message
+tagged \texttt{FINAL}, even if the value tagged \texttt{ONE} is not
+equivalent to the process's actual value.
+
+This model can be found in the accompanying file named
+\texttt{leader\_election\_buggy.m}.
 
 \subsection{Identifying the Flaw with \texttt{romp}}\label{subsec:identifying-the-flaw-in-romp}
 
-%  TODO: This.
-\textbf{TODO: This.}
+The state space of this model is enormous.
 
-\subsection{Results from \texttt{rumur}}\label{subsec:results-from-rumur}
+Initially, we utilize the \texttt{romp} command to generate C++ code for the
+model, using the same four arguments as we did for the tic-tac-toe strategy.
+The \texttt{-S} flag is specified to generate ``simple traces'' of the model.
+We also provide the filename of the model and use the \texttt{-o} flag to
+indicate the desired output filename for the resulting C++ file.
+Upon invocation, \texttt{romp} parses the model and generates a C++ program
+that will perform a parallel random walk through the state space.
+Multiple threads concurrently walk through the model from the initial state
+making random transitions, repeating this process several times to
+efficiently cover an extensive state space quickly.
+After compiling the generated C++ program, we execute the resulting binary
+with the \texttt{-t} flag, which instructs the program to record traces from
+the model's execution.
 
-%  TODO: This.
-\textbf{TODO: This.}
+The generated program upon execution detects the presence of several sequences
+where the assertions are violated.
+That is, either there are unreceived messages,
+not all processes are in the \texttt{FINISHED} state,
+or the processes haven't recorded the correct \texttt{FINAL} value.
+The program's execution produces ninety-six distinct traces,
+saved as JSON files, and identifies the traces that demonstrate violated
+assertions.
+These trace files are substantive, and tedious to interpret manually;
+As such, we suggest employing a filtering utility like \texttt{sed}
+to reduce the trace file to a manageable size for easier analysis.
+
+These trace files show that processes are incorrectly entering the
+\texttt{FINISHED} state and sending a \texttt{FINAL} message.
+We can see that the ``Active process: awaiting \texttt{ONE}: found max value''
+rule is being applied when not appropriate.
+Upon viewing the condition upon which this rule can be applied, we see that
+the rule is not checking that the received value is equivalent to the
+current process's actual value;
+we tighten this condition and the resulting model
+(\texttt{leader\_election\_fixed.m}) successfully passes all checks.
+
+\subsection{A Word on \texttt{rumur}}\label{subsec:a-word-on-rumur}
+
+The leader election protocol involves a considerable state space due to the
+presence of four hundred processes and various possible combinations of their
+states.
+Unfortunately, the size of this state space surpasses the capabilities of
+\texttt{rumur}, rendering it ineffective for comprehensive analysis.
+\texttt{rumur} relies on explicit enumeration, systematically exploring every
+potential state of a model.
+However, the enormous scale of the state space in the leader election
+protocol makes it impractical to exhaustively cover all possible states using
+\texttt{rumur}.
+Consequently, we are unable to obtain meaningful results from \texttt{rumur}
+regarding the correctness of the model or the identification of flaws.
+To overcome this limitation, we employ the parallel random walk strategy
+offered by \texttt{romp}, which allows us to navigate the extensive state
+space efficiently and detect potential bugs in the leader election protocol.
