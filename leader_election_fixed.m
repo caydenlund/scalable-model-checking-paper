@@ -65,7 +65,7 @@
 
 Const
     --  The number of processes.
-    NUM_PROCESSES : 12;
+    NUM_PROCESSES : 10;
 
     --  Value multiplier.
     --  Values range from (this) to (this * NUM_PROCESSES).
@@ -136,7 +136,7 @@ Procedure swap(Var left : value_t;
                Var right : value_t);
 Var temp : value_t;
 Begin
-    temp := values[left];
+    temp := left;
     left := right;
     right := temp;
 End;
@@ -148,7 +148,8 @@ Procedure reset_all(Var states : Array[proc_index_t] of proc_state_t;
                     Var value_channel : Array[proc_index_t] of value_t;
                     Var tag_channel : Array[proc_index_t] of tag_t;
                     Var chan_states : Array[proc_index_t] of chan_state_t);
-Var index_j : proc_index_t;
+Var index_start : proc_index_t;
+Var index_swap : 0..(2 * NUM_PROCESSES);  --  That way, we can go out-of-bounds.
 Begin
     For index : proc_index_t Do
         states[index] := ACTIVE_READY;
@@ -157,14 +158,19 @@ Begin
     End;
     
     --  Shuffle the values array.
-    --  TODO: This.
-    --  For index_i : 2..(NUM_PROCESSES / 2) Do
-    --      index_j := 1;
-    --      While index_j != 0 Do
-    --          swap(values[index_i], values[index_j]);
-    --          index_j := (index_j + index_i) % NUM_PROCESSES;
-    --      Endwhile;
-    --  End;
+    If NUM_PROCESSES >= 4 Then
+        For stride : 2..(NUM_PROCESSES / 2) Do
+            index_start := 0;
+            While index_start < stride Do
+                index_swap := stride;
+                While index_swap < NUM_PROCESSES Do
+                    swap(values[index_start], values[index_swap]);
+                    index_swap := index_swap + stride;
+                Endwhile;
+                index_start := index_start + 1;
+            Endwhile;
+        Endfor;
+    Endif;
 End;
 
 
