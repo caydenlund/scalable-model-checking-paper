@@ -18,7 +18,7 @@
 --  The problem:
 ----------------
 
---  There are `N` processes. Each process has a unique number.
+--  There are `NUM_PROCESSES` processes. Each process has a unique number.
 --
 --  These processes form a ring; one process can receive a message from its left
 --  and send a message to its right.
@@ -30,30 +30,32 @@
 --  The algorithm:
 ------------------
 
---  Initially, each process is `active` and has a unique `value`.
+--  Initially, each process is `ACTIVE` and has a unique `value`.
 --
---  Each process is responsible for some `max_value`, which may change during
---  execution.
+--  A process becomes `PASSIVE` when it learns that it does not hold a
+--  `value` that can be the actual maximum value.
 --
---  A process becomes `passive` when it learns that it does not hold a
---  `max_value` that can be the actual maximum value.
+--  A `PASSIVE` process can only receive messages from its left and forward
+--  them to its right.
 --
---  A `passive` process can only pass messages from left to right.
+--  Each `ACTIVE` process sends its own value to the right and then waits to
+--  receive the value of the closest `ACTIVE` process on its left.
+--  This message is tagged `ONE`.
 --
---  Each `active` process sends its own value to the right and then waits to
---  receive the value of the closest active process on its left.
---  This message is tagged `one`.
---
---  If the value that an `active` process receives is not the same value that it
---  sent out, then it waits for the value of the second-closest active process
---  on its left. This message is tagged `two`. If the value of this process is
+--  If the value that an `ACTIVE` process receives is not the same value that it
+--  sent out, then it waits for the value of the second-closest `ACTIVE` process
+--  on its left. This message is tagged `TWO`. If the value of this process is
 --  the largest of the three, then it keeps its value; otherwise, it becomes
---  `passive`.
+--  `PASSIVE`.
 --
---  If an `active` process receives the same value that it sent, then it can
---  conclude that it is the only `active` process and has the maximum value.
+--  If an `ACTIVE` process receives the same value that it sent, then it can
+--  conclude that it is the only `ACTIVE` process and has the maximum value.
+--  Once this happens, then it sends its value once more, tagged as `FINAL`, and
+--  becomes a `FINISHED` process.
 --
---  TODO: Discuss propagation.
+--  If a process receives a message tagged as `FINAL`, then it saves the value
+--  as the maximum value, forwards the message to its right, and becomes a
+--  `FINISHED` process.
 
 
 
@@ -63,7 +65,11 @@
 
 Const
     --  The number of processes.
-    NUM_PROCESSES : 5;
+    NUM_PROCESSES : 12;
+
+    --  Value multiplier.
+    --  Values range from (this) to (this * NUM_PROCESSES).
+    VALUE_MULTIPLIER : 100;
 
 
 
@@ -76,8 +82,7 @@ Type
     proc_index_t : 0..(NUM_PROCESSES - 1);
 
     --  The value that a process can have.
-    --  value_t : MIN_VALUE..MAX_VALUE;
-    value_t : proc_index_t;
+    value_t : 100..(100 * NUM_PROCESSES);
 
     --  The possible tags that a message can have.
     tag_t : Enum { ONE, TWO, FINAL };
@@ -147,7 +152,7 @@ Var index_j : proc_index_t;
 Begin
     For index : proc_index_t Do
         states[index] := ACTIVE_READY;
-        values[index] := index;
+        values[index] := 100 * (index + 1);
         chan_states[index] := FREE;
     End;
     
@@ -281,11 +286,35 @@ Ruleset proc_index : proc_index_t Do
         Endrule;
         
         --  If this is an active process awaiting the `TWO` message, and the
+        --  input channel is sending a `TWO` message with the same value as
+        --  this process's value, then check whether this process has the
+        --  maximum value.
+        Rule "Active process: awaiting `TWO`: found max value"
+            state = ACTIVE_AWAITING_TWO &
+            in_state = BUSY &
+            in_tag = TWO &
+            in_val = val &
+            out_state = FREE
+        ==>
+        Begin
+            If val > prev_val Then
+                state := FINISHED;
+                out_val := val;
+                out_tag := FINAL;
+                out_state := BUSY;
+            Else
+                state := PASSIVE;
+            End;
+            in_state := FREE;
+        Endrule;
+        
+        --  If this is an active process awaiting the `TWO` message, and the
         --  input channel is sending a `TWO` message, accept it.
         Rule "Active process: awaiting `TWO`: accept value"
             state = ACTIVE_AWAITING_TWO &
             in_state = BUSY &
-            in_tag = TWO
+            in_tag = TWO &
+            in_val != val
         ==>
         Begin
             If val > prev_val & val > in_val Then
@@ -307,7 +336,7 @@ Ruleset proc_index : proc_index_t Do
             in_state := FREE;
             For index : proc_index_t Do
                 Assert "Clear message channel" chan_states[index] = FREE;
-                Assert "Correct maximum value" values[index] = NUM_PROCESSES - 1;
+                Assert "Correct maximum value" values[index] = VALUE_MULTIPLIER * NUM_PROCESSES;
             End;
             reset_all(states, values, previous_values,
                       value_channel, tag_channel, chan_states);
