@@ -1,4 +1,4 @@
-# Scalable Model Checking: A Practical Exploration
+# [Scalable Model Checking: A Practical Exploration](https://github.com/caydenlund/scalable-model-checking-paper)
 
 This repository contains the paper and all supporting documents.
 
