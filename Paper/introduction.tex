@@ -41,7 +41,7 @@ By defining the system's properties and constraints, engineers can create
 precise and detailed models that capture the essential aspects of the system's
 functionality.
 
-Moreover, the flexibility of the Murphi modeling language has led to the
+Moreover, the rigidity of the Murphi modeling language has led to the
 development of various model-checking tools specifically tailored for Murphi
 models.
 These tools, such as \texttt{rumur} and \texttt{romp}, offer different
@@ -87,3 +87,42 @@ Through these case studies, we evaluate the capabilities of
 \texttt{rumur} and \texttt{romp} in identifying and correcting flaws,
 shedding light on their respective strengths and limitations in different
 scenarios.
+
+\subsection{Supporting Files}\label{subsec:supporting-files}
+
+In support of this paper, several files have been provided to facilitate the
+reproduction and understanding of the presented work.
+These files are located in the \texttt{Models/} directory and serve various
+purposes in the context of the case studies.
+The following supporting files are included:
+
+\begin{itemize}
+    \item \texttt{tictactoe\_buggy.m}: This file contains the initial version
+    of the buggy tic-tac-toe strategy that was subjected to debugging and
+    analysis in this paper.
+    It serves as a starting point for the investigation and showcases the
+    flaws in the original strategy.
+
+    \item \texttt{tictactoe\_fixed.m}: This file contains the corrected
+    version of the tic-tac-toe strategy after the debugging process.
+    It represents the improved strategy that addresses the identified flaw
+    and ensures a winning or tied gameplay.
+
+    \item \texttt{leaderelection\_buggy.m}: The \texttt{leaderelection\_buggy.m}
+    file contains the original version of the buggy leader election protocol.
+    It is the basis for the analysis and correction of the protocol,
+    and has a bug in its implementation that we identify and correct.
+
+    \item \texttt{leaderelection\_fixed.m}: This file includes the fixed version
+    of the leader election protocol.
+
+    \item \texttt{Makefile}: The \texttt{Makefile} is a utility file provided
+    to automate the building and compilation of the model-checking executables.
+    It simplifies the process of generating the necessary binaries for
+    running the analysis on the provided models.
+\end{itemize}
+
+These supporting files, along with the accompanying explanations and
+discussions in the paper, enable readers to reproduce the experiments,
+examine the model structures, and gain a comprehensive understanding of the
+presented case studies.

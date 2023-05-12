@@ -40,13 +40,18 @@ First, each \texttt{ACTIVE} process sends its own value to the right and then
 awaits the value of the closest \texttt{ACTIVE} process on its left.
 This message, tagged as \texttt{ONE}, is saved for later use as a comparison
 to determine the maximum value.
+After saving the \texttt{ONE}-tagged message, the \texttt{ACTIVE} process then
+forwards that message to the process on its right with the tag \texttt{TWO}.
 
 If an \texttt{ACTIVE} process receives a value that is different from the one
 it sent, it waits for the value of the second-closest \texttt{ACTIVE} process
 on its left.
 This message, tagged as \texttt{TWO}, is then compared with the process's value
 and the previously-saved value of the closest \texttt{ACTIVE} process.
-If the value of the current process is the largest of the three,
+If the value of the current process is the largest of the three
+(i.e., the current process's value, the value of the closest \texttt{ACTIVE}
+process on the left, and the value of the second-closest \texttt{ACTIVE}
+process on the left),
 the current process retains its value and remains \texttt{ACTIVE}.
 Otherwise, it transitions to the \texttt{PASSIVE} state.
 
@@ -79,7 +84,7 @@ the model does not check whether the received value tagged \texttt{ONE} is
 equivalent to the current process's value.
 That is, any \texttt{ACTIVE} process receiving a value tagged \texttt{ONE}
 can apply this rule, mark itself as \texttt{FINISHED}, and send a message
-tagged \texttt{FINAL}, even if the value tagged \texttt{ONE} is not
+tagged \texttt{FINAL}, even if the received \texttt{ONE}-tagged value is not
 equivalent to the process's actual value.
 
 This model can be found in the accompanying file named
@@ -98,7 +103,7 @@ Upon invocation, \texttt{romp} parses the model and generates a C++ program
 that will perform a parallel random walk through the state space.
 Multiple threads concurrently walk through the model from the initial state
 making random transitions, repeating this process several times to
-efficiently cover an extensive state space quickly.
+cover an extensive state space quickly.
 After compiling the generated C++ program, we execute the resulting binary
 with the \texttt{-t} flag, which instructs the program to record traces from
 the model's execution.
@@ -112,7 +117,7 @@ The program's execution produces ninety-six distinct traces,
 saved as JSON files, and identifies the traces that demonstrate violated
 assertions.
 These trace files are substantive, and tedious to interpret manually;
-As such, we suggest employing a filtering utility like \texttt{sed}
+as such, we suggest using a filtering utility like \texttt{sed}
 to reduce the trace file to a manageable size for easier analysis.
 
 These trace files show that processes are incorrectly entering the

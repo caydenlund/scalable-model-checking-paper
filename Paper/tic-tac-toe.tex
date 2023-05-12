@@ -8,7 +8,7 @@
 
 \section{Case Study 1: A Tic-Tac-Toe Strategy}\label{sec:tic-tac-toe}
 
-Tic-Tac-Toe is a classic two-player game played on a $3 \times 3$ grid.
+Tic-tac-toe is a classic two-player game played on a $3 \times 3$ grid.
 The game is also known as \textit{noughts and crosses} or \textit{X's and O's},
 with one player marking the squares with X's and the other with O's.
 The objective of the game is for a player to get three marks in a row of that
@@ -173,8 +173,9 @@ experiment here may need to run the binary a couple of times for it to come
 across a losing sequence.
 The program's invocation saves ninety-six different traces as JSON files,
 and reports which one of the traces contains the losing sequence.
-For every state in the sequence, this trace lists every rule and states whether
-it applies to the state, before selecting and applying a rule.
+At every state in the sequence, the trace lists every rule, including
+the rules that don't apply to the state, before selecting and applying an
+appropriate rule.
 Thus, this trace is very large and difficult to read by hand.
 We recommend using some kind of filtering utility like \texttt{sed} to trim
 down the trace file to a readable size, holding only relevant information.
